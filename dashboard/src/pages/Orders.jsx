@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import { Helmet } from "react-helmet";
 import { v4 as uuid } from "uuid";
@@ -14,14 +14,17 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  CircularProgress,
 } from "@material-ui/core";
-import AppBar from "@material-ui/core/AppBar";
-import Tabs from "@material-ui/core/Tabs";
-import Tab from "@material-ui/core/Tab";
+
 import OrderDetails from "src/components/orders//OrderDetails";
 import SearchIcon from "@material-ui/icons/Search";
 import PropTypes from "prop-types";
-import FilterListIcon from '@material-ui/icons/FilterList';
+import FilterListIcon from "@material-ui/icons/FilterList";
+
+import axios from "axios";
+import { API_SERVICE } from "../URI";
+
 const Orders = () => {
   const [value, setValue] = useState(0);
 
@@ -61,165 +64,6 @@ const Orders = () => {
     };
   }
 
-  const orders = [
-    {
-      id: uuid(),
-      ref: "CDD1044",
-      amount: 16.76,
-      customer: {
-        name: "Adam Denisov",
-        title: "Employee",
-        company: "Apple Cop.",
-        location: "Mountview California"
-      },
-      createdAt: 1554670800000,
-      status: "delivered",
-    },
-    {
-      id: uuid(),
-      ref: "CDD1044",
-      amount: 16.76,
-      customer: {
-        name: "Adam Denisov",
-        title: "Employee",
-        company: "Apple Cop.",
-        location: "Mountview California"
-      },
-      createdAt: 1554670800000,
-      status: "delivered",
-    },
-    {
-      id: uuid(),
-      ref: "CDD1044",
-      amount: 16.76,
-      customer: {
-        name: "Adam Denisov",
-        title: "Employee",
-        company: "Apple Cop.",
-        location: "Mountview California"
-      },
-      createdAt: 1554670800000,
-      status: "delivered",
-    },
-    {
-      id: uuid(),
-      ref: "CDD1044",
-      amount: 16.76,
-      customer: {
-        name: "Adam Denisov",
-        title: "Employee",
-        company: "Apple Cop.",
-        location: "Mountview California"
-      },
-      createdAt: 1554670800000,
-      status: "delivered",
-    },
-    {
-      id: uuid(),
-      ref: "CDD1044",
-      amount: 16.76,
-      customer: {
-        name: "Adam Denisov",
-        title: "Employee",
-        company: "Apple Cop.",
-        location: "Mountview California"
-      },
-      createdAt: 1554670800000,
-      status: "delivered",
-    },
-    {
-      id: uuid(),
-      ref: "CDD1044",
-      amount: 16.76,
-      customer: {
-        name: "Adam Denisov",
-        title: "Employee",
-        company: "Apple Cop.",
-        location: "Mountview California"
-      },
-      createdAt: 1554670800000,
-      status: "delivered",
-    },
-    {
-      id: uuid(),
-      ref: "CDD1044",
-      amount: 16.76,
-      customer: {
-        name: "Adam Denisov",
-        title: "Employee",
-        company: "Apple Cop.",
-        location: "Mountview California"
-      },
-      createdAt: 1554670800000,
-      status: "delivered",
-    },
-    {
-      id: uuid(),
-      ref: "CDD1044",
-      amount: 16.76,
-      customer: {
-        name: "Adam Denisov",
-        title: "Employee",
-        company: "Apple Cop.",
-        location: "Mountview California"
-      },
-      createdAt: 1554670800000,
-      status: "delivered",
-    },
-    {
-      id: uuid(),
-      ref: "CDD1044",
-      amount: 16.76,
-      customer: {
-        name: "Adam Denisov",
-        title: "Employee",
-        company: "Apple Cop.",
-        location: "Mountview California"
-      },
-      createdAt: 1554670800000,
-      status: "delivered",
-    },
-    {
-      id: uuid(),
-      ref: "CDD1044",
-      amount: 16.76,
-      customer: {
-        name: "Adam Denisov",
-        title: "Employee",
-        company: "Apple Cop.",
-        location: "Mountview California"
-      },
-      createdAt: 1554670800000,
-      status: "delivered",
-    },
-    {
-      id: uuid(),
-      ref: "CDD1044",
-      amount: 16.76,
-      customer: {
-        name: "Adam Denisov",
-        title: "Employee",
-        company: "Apple Cop.",
-        location: "Mountview California"
-      },
-      createdAt: 1554670800000,
-      status: "delivered",
-    },
-    {
-      id: uuid(),
-      ref: "CDD1044",
-      amount: 16.76,
-      customer: {
-        name: "Adam Denisov",
-        title: "Employee",
-        company: "Apple Cop.",
-        location: "Mountview California"
-      },
-      createdAt: 1554670800000,
-      status: "delivered",
-    },
-  ];
-
   const [open, setOpen] = React.useState(false);
 
   const handleClickOpen = () => {
@@ -232,7 +76,7 @@ const Orders = () => {
 
   return (
     <>
-      <Dialog
+      {/* <Dialog
         open={open}
         fullWidth
         maxWidth="md"
@@ -242,13 +86,49 @@ const Orders = () => {
       >
         <DialogTitle id="alert-dialog-title">Apply Filters</DialogTitle>
         <DialogContent>
-          <div >
-            <TextField id="outlined-basic" style={{ marginBottom: '18px' }} fullWidth label="Name" variant="outlined" />
-            <TextField id="outlined-basic" style={{ marginBottom: '18px' }} fullWidth label="Job Title" variant="outlined" />
-            <TextField id="outlined-basic" style={{ marginBottom: '18px' }} fullWidth label="Company Name" variant="outlined" />
-            <TextField id="outlined-basic" style={{ marginBottom: '18px' }} fullWidth label="Location" variant="outlined" />
-            <TextField id="outlined-basic" style={{ marginBottom: '18px' }} fullWidth label="Employee" variant="outlined" />
-            <TextField id="outlined-basic" style={{ marginBottom: '18px' }} fullWidth label="Industry" variant="outlined" />
+          <div>
+            <TextField
+              id="outlined-basic"
+              style={{ marginBottom: "18px" }}
+              fullWidth
+              label="Name"
+              variant="outlined"
+            />
+            <TextField
+              id="outlined-basic"
+              style={{ marginBottom: "18px" }}
+              fullWidth
+              label="Job Title"
+              variant="outlined"
+            />
+            <TextField
+              id="outlined-basic"
+              style={{ marginBottom: "18px" }}
+              fullWidth
+              label="Company Name"
+              variant="outlined"
+            />
+            <TextField
+              id="outlined-basic"
+              style={{ marginBottom: "18px" }}
+              fullWidth
+              label="Location"
+              variant="outlined"
+            />
+            <TextField
+              id="outlined-basic"
+              style={{ marginBottom: "18px" }}
+              fullWidth
+              label="Employee"
+              variant="outlined"
+            />
+            <TextField
+              id="outlined-basic"
+              style={{ marginBottom: "18px" }}
+              fullWidth
+              label="Industry"
+              variant="outlined"
+            />
           </div>
         </DialogContent>
         <DialogActions>
@@ -259,8 +139,7 @@ const Orders = () => {
             Apply Filter
           </Button>
         </DialogActions>
-      </Dialog>
-
+      </Dialog> */}
 
       <Helmet>
         <title>Customers | Client Portal</title>
@@ -272,7 +151,7 @@ const Orders = () => {
           padding: "30px",
         }}
       >
-        <Container maxWidth={false}>
+        <Container maxWidth={false} style={{ padding: "0 !important" }}>
           <div
             style={{
               display: "flex",
@@ -290,47 +169,10 @@ const Orders = () => {
               </IconButton>
             </div>
           </div>
-          
-
-          <Button 
-            variant="contained"
-            style={{ float: 'right', marginRight: '35px', marginTop: '20px' }}
-            color="primary"
-            startIcon={<FilterListIcon />}
-            onClick={handleClickOpen}
-          >
-            Filter
-          </Button>
-
-
-          <Grid container spacing={3}>
-            <Grid item xs={12}>
-              <AppBar
-                position="static"
-                style={{ background: "transparent", boxShadow: "none" }}
-              >
-                <Tabs
-                  value={value}
-                  onChange={handleChange}
-                  aria-label="simple tabs example"
-                >
-                  <Tab label="Contacts" {...a11yProps(0)} />
-                  <Tab label="Company" {...a11yProps(1)} />
-                  <Tab label="Lists" {...a11yProps(2)} />
-                </Tabs>
-              </AppBar>
-              <TabPanel value={value} index={0}>
-                <OrderDetails orders={orders} />
-              </TabPanel>
-              <TabPanel value={value} index={1}>
-                <OrderDetails orders={orders.slice(0, 2)} />
-              </TabPanel>
-              <TabPanel value={value} index={2}>
-                <OrderDetails orders={orders.slice(3, 4)} />
-              </TabPanel>
-            </Grid>
-          </Grid>
         </Container>
+        <div style={{ marginTop: "50px" }}>
+          <OrderDetails />
+        </div>
       </Box>
     </>
   );

@@ -1,8 +1,6 @@
 import { Helmet } from "react-helmet";
-import { Box, Container, Grid, Typography } from "@material-ui/core";
+import { Box, Container, Grid, Typography, Button } from "@material-ui/core";
 import LatestOrders from "src/components/dashboard//LatestOrders";
-import OrderStatus from "src/components/dashboard//OrderStatus";
-import SubscriptionOrders from "src/components/dashboard//SubscriptionOrders";
 
 const Dashboard = () => (
   <>
@@ -20,6 +18,7 @@ const Dashboard = () => (
         <Typography variant="h4" sx={{ my: "20px" }}>
           Saved List
         </Typography>
+
         <Grid container spacing={3}>
           <Grid item xs={12}>
             <LatestOrders />

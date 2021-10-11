@@ -1,0 +1,9 @@
+.download-table-xls-button {
+  padding: 15px 20px;
+  outline: none;
+  border-radius: 10px;
+  border: none;
+  background-color: #5664d2;
+  color: white;
+  cursor: pointer;
+}

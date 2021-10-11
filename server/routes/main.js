@@ -1,40 +1,15 @@
 const express = require("express");
 const router = express.Router();
-const { v4: uuidv4 } = require("uuid");
-// Getting Module
+const { MongoClient } = require("mongodb");
+const uri = require("../config/keys").MongoURI;
+
 const Products_Model = require("../models/Products");
-
-
-const stripe = require("stripe")(
-  "sk_test_51IdwfeH8KzFo5uc9YHKzp2HOPkZJvH0ij0qhWeg0wQ17G73o5fVJYjMkWOfAmWUgjVZe0DesJvrQKbmAPSacXsVP00qMXnEqFr"
-);
-
-function isNumeric(str) {
-  if (typeof str != "string") return false; // we only process strings!
-  return (
-    !isNaN(str) && // use type coercion to parse the _entirety_ of the string (`parseFloat` alone does not do this)...
-    !isNaN(parseFloat(str))
-  ); // ...and ensure strings of whitespace fail
-}
 
 // TEST
 // @GET TEST
 // GET
 router.get("/test", (req, res) => {
   res.send("Working");
-});
-
-router.post("/charges", async (req, res) => {
-  const { email, amount } = req.body;
-  const paymentIntent = await stripe.paymentIntents.create({
-    amount: amount * 100,
-    currency: "eur",
-    // Verify your integration in this guide by including this parameter
-    metadata: { integration_check: "accept_a_payment" },
-    receipt_email: email,
-  });
-
-  res.json({ client_secret: paymentIntent["client_secret"] });
 });
 
 // Database CRUD Operations
@@ -49,7 +24,122 @@ router.get("/getallproductapi", (req, res) => {
     .catch((err) => res.status(400).json(`Error: ${err}`));
 });
 
+const client = new MongoClient(uri, {
+  useUnifiedTopology: true,
+  useNewUrlParser: true,
+});
 
+router.get("/fetch_users/:page/:rowsPerPage", (req, res) => {
+  async function fetchUsersList() {
+    try {
+      const { page, rowsPerPage } = req.params;
+      await client.connect();
+      const database = client.db("SearchSAAS");
+      const collection = database.collection(`Users`);
+      const usersList = await collection
+        .find()
+        .sort({ id: -1 })
+        .limit(Number(rowsPerPage))
+        .skip(Number(page))
+        .toArray();
+      res.json({ users: usersList });
+    } catch (err) {
+      res.json({ error: err.message });
+    }
+  }
+  fetchUsersList();
+});
 
+router.post("/filter_users", (req, res) => {
+  async function fetchUsersList() {
+    try {
+      const search = req.body;
+      await client.connect();
+      const database = client.db("SearchSAAS");
+      const collection = database.collection(`Users`);
+      let filterData = {
+        name: "NO-DATA",
+        company: "NO-DATA",
+        linkedin: "NO-DATA",
+        designation: "NO-DATA",
+        phone: "NO-DATA",
+        // email: "NO-DATA",
+      };
+      if (search?.name?.length > 0)
+        filterData.name = new RegExp(search?.name, "i");
+      if (search?.company?.length > 0)
+        filterData.company = new RegExp(search?.company, "i");
+      if (search?.linkedin?.length > 0)
+        filterData.linkedin = new RegExp(search?.linkedin, "i");
+      if (search?.design?.length > 0)
+        filterData.designation = new RegExp(search?.design, "i");
+      // if (search?.email?.length > 0)
+      //   filterData.email = new RegExp(search?.email, "i");
+      if (search?.phone?.length > 0)
+        filterData.phone = new RegExp(search?.phone, "i");
+
+      console.log(filterData);
+
+      const usersList = await collection
+        .find({
+          $or: [
+            { first_name: filterData.name },
+            { last_name: filterData.name },
+            { job_company_name: filterData.company },
+            { linkedin_username: filterData.linkedin },
+            { job_title_role: filterData.designation },
+            // { email: filterData.email },
+            { mobile_phone: filterData.phone },
+          ],
+        })
+        .limit(600)
+        .toArray();
+
+      res.json({ users: usersList });
+    } catch (err) {
+      res.json({ error: err.message });
+    }
+  }
+  fetchUsersList();
+});
+
+router.get("/fetch_saved_users", (req, res) => {
+  async function fetchUsersList() {
+    try {
+      await client.connect();
+      const database = client.db("SearchSAAS");
+
+      const collection = database.collection(`SavedUsers`);
+
+      const usersList = await collection.find().toArray();
+      res.json({ users: usersList, error: "" });
+    } catch (err) {
+      res.json({ error: err.message, users: "" });
+    }
+  }
+  fetchUsersList();
+});
+
+router.post("/add-user", (req, res) => {
+  async function saveUsersList() {
+    try {
+      await client.connect();
+      const database = client.db("SearchSAAS");
+
+      const collection1 = database.collection(`SavedUsers`);
+      const query = req.body;
+      const alreadyExists = await collection1.count(query, { limit: 1 });
+      if (alreadyExists == 1) {
+        return res.json({ error: "This user is already saved!", refNo: "" });
+      }
+      //  const userData=await collection.find(query)
+      const result = await collection1.insertOne(query);
+      return res.json({ refNo: result.insertedId, error: "" });
+    } catch (err) {
+      return res.json({ error: err.message, refNo: "" });
+    }
+  }
+  saveUsersList();
+});
 
 module.exports = router;

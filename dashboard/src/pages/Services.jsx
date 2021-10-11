@@ -1,16 +1,22 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 
 import { Helmet } from "react-helmet";
 import {
   Box,
   Container,
   Typography,
+  Autocomplete,
+  Button,
+  TextField,
 } from "@material-ui/core";
-import AppBar from '@material-ui/core/AppBar';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
-import { makeStyles } from '@material-ui/core/styles';
-import PropTypes from 'prop-types';
+import AppBar from "@material-ui/core/AppBar";
+import Tabs from "@material-ui/core/Tabs";
+import Tab from "@material-ui/core/Tab";
+import { makeStyles } from "@material-ui/core/styles";
+import PropTypes from "prop-types";
+
+import EmailEditor from "react-email-editor";
+
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
 
@@ -40,7 +46,7 @@ TabPanel.propTypes = {
 function a11yProps(index) {
   return {
     id: `simple-tab-${index}`,
-    'aria-controls': `simple-tabpanel-${index}`,
+    "aria-controls": `simple-tabpanel-${index}`,
   };
 }
 
@@ -52,13 +58,20 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const Services = () => {
-
   const classes = useStyles();
   const [value, setValue] = React.useState(0);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
+
+  const emailEditorRef = useRef(null);
+  const onLoad = () => {
+    // you can load your template here;
+    // const templateJson = {};
+    // emailEditorRef.current.editor.loadDesign(templateJson);
+  };
+
   return (
     <>
       <Helmet>
@@ -96,26 +109,43 @@ const Services = () => {
               <Tab label="Emails" {...a11yProps(0)} />
               <Tab label="Calls" {...a11yProps(1)} />
               <Tab label="Tasks" {...a11yProps(2)} />
-              <Tab label="Templates" {...a11yProps(3)} />
-              <Tab label="Analytics" {...a11yProps(4)} />
             </Tabs>
           </AppBar>
           <TabPanel value={value} index={0}>
-            
+            <div
+              style={{ display: "flex", justifyContent: "center", flex: "0.2" }}
+            >
+              <Autocomplete
+                // options={userContactsEmail}
+                getOptionLabel={(opt) => opt}
+                style={{ width: "50%" }}
+                renderInput={(param) => {
+                  return (
+                    <TextField
+                      {...param}
+                      label="Search E-mail"
+                      variant="outlined"
+                    />
+                  );
+                }}
+              ></Autocomplete>
+              <Button
+                // onClick={() => setOpenEmailAdd(true)}
+                variant="contained"
+                style={{ margin: "10px" }}
+              >
+                Add Contact
+              </Button>
+            </div>
+
+            <EmailEditor
+              style={{ marginTop: "40px", height: "60vh" }}
+              ref={emailEditorRef}
+              onLoad={onLoad}
+            />
           </TabPanel>
-          <TabPanel value={value} index={1}>
-            
-          </TabPanel>
-          <TabPanel value={value} index={2}>
-            
-          </TabPanel>
-          <TabPanel value={value} index={3}>
-            
-          </TabPanel>
-          <TabPanel value={value} index={4}>
-            
-          </TabPanel>
-          
+          <TabPanel value={value} index={1}></TabPanel>
+          <TabPanel value={value} index={2}></TabPanel>
         </Container>
       </Box>
     </>
