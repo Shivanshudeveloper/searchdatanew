@@ -295,7 +295,7 @@ const OrderDetails = () => {
                     {order?.job_title_levels?.join("") || "-"}
                   </TableCell>
                   <TableCell>{order?.job_title_role || "-"}</TableCell>
-                  <TableCell>{order?.email?.join(",") || "-"}</TableCell>
+                  <TableCell>{order?.work_email || "-"}</TableCell>
                   <TableCell>{order?.mobile_phone || "-"}</TableCell>
                   <TableCell>{order?.linkedin_username || "-"}</TableCell>
                   <TableCell>{order?.countries?.join(",") || "-"}</TableCell>
@@ -410,7 +410,7 @@ const OrderDetails = () => {
               label="Country"
               variant="outlined"
             /> */}
-            {/* <TextField
+            <TextField
               id="outlined-basic"
               style={{ marginBottom: "18px" }}
               defaultValue="Email"
@@ -419,7 +419,7 @@ const OrderDetails = () => {
               fullWidth
               label="Email"
               variant="outlined"
-            /> */}
+            />
             <TextField
               id="outlined-basic"
               style={{ marginBottom: "18px" }}
