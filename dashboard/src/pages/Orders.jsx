@@ -151,25 +151,6 @@ const Orders = () => {
           padding: "30px",
         }}
       >
-        <Container maxWidth={false} style={{ padding: "0 !important" }}>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <Typography variant="h4" sx={{ my: "20px" }}>
-              Search
-            </Typography>
-            <div>
-              <TextField label="Search" variant="filled" size="small" />
-              <IconButton>
-                <SearchIcon />
-              </IconButton>
-            </div>
-          </div>
-        </Container>
         <div style={{ marginTop: "50px" }}>
           <OrderDetails />
         </div>

@@ -15,9 +15,9 @@ import RoomServiceIcon from "@material-ui/icons/RoomService";
 import ConfirmationNumberIcon from "@material-ui/icons/ConfirmationNumber";
 
 import NavItem from "./NavItem";
-import HomeIcon from '@material-ui/icons/Home';
-import SearchIcon from '@material-ui/icons/Search';
-import SettingsIcon from '@material-ui/icons/Settings';
+import HomeIcon from "@material-ui/icons/Home";
+import SearchIcon from "@material-ui/icons/Search";
+import SettingsIcon from "@material-ui/icons/Settings";
 const user = {
   avatar: "/static/images/avatars/avatar_6.png",
   jobTitle: "",
@@ -49,7 +49,7 @@ const items = [
     href: "/app/account",
     icon: SettingsIcon,
     title: "Settings",
-  }
+  },
 ];
 
 const DashboardSidebar = ({ onMobileClose, openMobile }) => {
@@ -111,6 +111,7 @@ const DashboardSidebar = ({ onMobileClose, openMobile }) => {
           {user.jobTitle}
         </Typography>
       </Box>
+      <div id="google_translate_element"></div>
     </Box>
   );
 

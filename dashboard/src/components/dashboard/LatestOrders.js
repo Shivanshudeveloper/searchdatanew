@@ -113,7 +113,7 @@ const LatestOrders = (props) => {
   };
 
   const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
@@ -129,6 +129,7 @@ const LatestOrders = (props) => {
   };
 
   if (orders?.length === 0) return <CircularProgress />;
+  console.log(orders);
 
   return (
     <>
@@ -215,7 +216,11 @@ const LatestOrders = (props) => {
                     <TableCell>{order?.company || "-"}</TableCell>
                     <TableCell>{order?.designation || "-"}</TableCell>
                     <TableCell>{order?.email || "-"}</TableCell>
-                    <TableCell>{order?.linkedin || "-"}</TableCell>
+                    <TableCell>
+                      <a href={order?.userInfoCompressed?.linkedin_url}>
+                        {order?.linkedin || "-"}
+                      </a>
+                    </TableCell>
                     <TableCell>{order?.country || "-"}</TableCell>
                   </TableRow>
                 ))}
@@ -228,12 +233,7 @@ const LatestOrders = (props) => {
               <TableFooter>
                 <TableRow>
                   <TablePagination
-                    rowsPerPageOptions={[
-                      5,
-                      10,
-                      25,
-                      { label: "All", value: -1 },
-                    ]}
+                    rowsPerPageOptions={[10, 25, { label: "All", value: -1 }]}
                     count={orders?.length}
                     rowsPerPage={rowsPerPage}
                     page={page}

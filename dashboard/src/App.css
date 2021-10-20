@@ -7,3 +7,8 @@
   color: white;
   cursor: pointer;
 }
+
+#google_translate_element {
+  display: flex;
+  justify-content: center;
+}

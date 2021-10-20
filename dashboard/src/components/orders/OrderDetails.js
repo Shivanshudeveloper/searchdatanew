@@ -24,7 +24,11 @@ import {
   DialogContent,
   DialogActions,
   Typography,
+  Toolbar,
+  Checkbox,
+  Container,
 } from "@material-ui/core";
+import { alpha } from "@material-ui/core/styles";
 
 import FirstPageIcon from "@material-ui/icons/FirstPage";
 import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
@@ -33,6 +37,7 @@ import LastPageIcon from "@material-ui/icons/LastPage";
 import CloseIcon from "@material-ui/icons/Close";
 import AddIcon from "@material-ui/icons/Add";
 import FilterListIcon from "@material-ui/icons/FilterList";
+import SearchIcon from "@material-ui/icons/Search";
 
 import axios from "axios";
 import { API_SERVICE } from "../../URI";
@@ -114,9 +119,20 @@ const OrderDetails = () => {
     axios
       .post(`${API_SERVICE}/add-user`, data)
       .then((res) => {
-        setMessage("SAVED");
+        setMessage(res.data.error.length > 0 ? res.data.error : "SAVED");
         handleClick();
         console.log(res.data);
+      })
+      .catch((err) => console.log(err));
+  };
+  const saveMultipleToList = async () => {
+    axios
+      .post(`${API_SERVICE}/add-all-user`, selected)
+      .then((res) => {
+        setMessage(res.data.error.length > 0 ? res.data.error : "SAVED");
+        handleClick();
+        setSelected([]);
+        // console.log(res.data);
       })
       .catch((err) => console.log(err));
   };
@@ -218,10 +234,137 @@ const OrderDetails = () => {
     }
   };
 
+  const [selected, setSelected] = useState([]);
+  const isSelected = (name) => selected.indexOf(name) !== -1;
+
+  const EnhancedTableToolbar = (props) => {
+    const { numSelected } = props;
+
+    return (
+      <Toolbar
+        sx={{
+          pl: { sm: 2 },
+          pr: { xs: 1, sm: 1 },
+          ...(numSelected > 0 && {
+            bgcolor: (theme) =>
+              alpha(
+                theme.palette.primary.main,
+                theme.palette.action.activatedOpacity
+              ),
+          }),
+        }}
+      >
+        {numSelected > 0 ? (
+          <Typography
+            sx={{ flex: "1 1 100%" }}
+            color="inherit"
+            variant="subtitle1"
+            component="div"
+          >
+            {numSelected} selected
+          </Typography>
+        ) : (
+          <Typography
+            sx={{ flex: "1 1 100%" }}
+            variant="h6"
+            id="tableTitle"
+            component="div"
+          >
+            DATA
+          </Typography>
+        )}
+
+        {numSelected > 0 && (
+          <Button
+            onClick={() => {
+              saveMultipleToList();
+            }}
+          >
+            Save
+          </Button>
+        )}
+      </Toolbar>
+    );
+  };
+
+  EnhancedTableToolbar.propTypes = {
+    numSelected: PropTypes.number.isRequired,
+  };
+
+  const handleClickSelected = (event, name) => {
+    const selectedIndex = selected.indexOf(name);
+    let newSelected = [];
+
+    if (selectedIndex === -1) {
+      newSelected = newSelected.concat(selected, name);
+    } else if (selectedIndex === 0) {
+      newSelected = newSelected.concat(selected.slice(1));
+    } else if (selectedIndex === selected.length - 1) {
+      newSelected = newSelected.concat(selected.slice(0, -1));
+    } else if (selectedIndex > 0) {
+      newSelected = newSelected.concat(
+        selected.slice(0, selectedIndex),
+        selected.slice(selectedIndex + 1)
+      );
+    }
+
+    setSelected(newSelected);
+  };
+
+  const [searchField, setSearchField] = useState("");
+  const searchResult = () => {
+    setOrders([]);
+    if (searchField !== "") {
+      axios
+        .post(`${API_SERVICE}/search_users/`, { searchField })
+        .then((res) => {
+          handleCloseDialog();
+          setSearchField("");
+          if (res.data?.users?.length > 0) {
+            setOrders(res.data.users);
+            setIsFilter(true);
+          } else {
+            setMessage(`No data found`);
+            handleClick();
+            getOrders();
+          }
+        })
+        .catch((err) => console.log(err));
+    } else {
+      getOrders();
+      handleCloseDialog();
+    }
+  };
+
   if (orders?.length === 0) return <CircularProgress />;
 
   return (
     <Card>
+      <Container maxWidth={false} style={{ padding: "0 !important" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <Typography variant="h4" sx={{ my: "20px" }}>
+            Search
+          </Typography>
+          <div>
+            <TextField
+              label="Search"
+              variant="filled"
+              size="small"
+              value={searchField}
+              onChange={(e) => setSearchField(e.target.value)}
+            />
+            <IconButton>
+              <SearchIcon onClick={searchResult} />
+            </IconButton>
+          </div>
+        </div>
+      </Container>
       <Snackbar
         open={open}
         autoHideDuration={6000}
@@ -229,6 +372,7 @@ const OrderDetails = () => {
         message={message}
         action={action}
       />
+
       <PerfectScrollbar>
         <div
           style={{
@@ -269,10 +413,12 @@ const OrderDetails = () => {
             )}
           </div>
         </div>
+        <EnhancedTableToolbar numSelected={selected.length} />
         <Box sx={{ minWidth: 800 }}>
           <Table>
             <TableHead>
               <TableRow>
+                <TableCell></TableCell>
                 <TableCell>First Name</TableCell>
                 <TableCell>Last Name</TableCell>
                 <TableCell>Company</TableCell>
@@ -285,31 +431,47 @@ const OrderDetails = () => {
                 <TableCell></TableCell>
               </TableRow>
             </TableHead>
+
             <TableBody>
-              {orders?.map((order) => (
-                <TableRow hover key={order?.linkedin_username}>
-                  <TableCell>{order?.first_name || "-"}</TableCell>
-                  <TableCell>{order?.last_name || "-"}</TableCell>
-                  <TableCell>{order?.job_company_name || "-"}</TableCell>
-                  <TableCell>
-                    {order?.job_title_levels?.join("") || "-"}
-                  </TableCell>
-                  <TableCell>{order?.job_title_role || "-"}</TableCell>
-                  <TableCell>{order?.work_email || "-"}</TableCell>
-                  <TableCell>{order?.mobile_phone || "-"}</TableCell>
-                  <TableCell>{order?.linkedin_username || "-"}</TableCell>
-                  <TableCell>{order?.countries?.join(",") || "-"}</TableCell>
-                  <TableCell>
-                    <Button
-                      onClick={() => {
-                        saveToList(order);
-                      }}
-                    >
-                      Save
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
+              {orders?.map((order) => {
+                const isItemSelected = isSelected(order?.id);
+                return (
+                  <TableRow hover key={order?.linkedin_username}>
+                    <TableCell padding="checkbox">
+                      <Checkbox
+                        color="primary"
+                        checked={isItemSelected}
+                        onClick={(event) =>
+                          handleClickSelected(event, order?.id)
+                        }
+                        inputProps={{
+                          "aria-labelledby": order.id,
+                        }}
+                      />
+                    </TableCell>
+                    <TableCell>{order?.first_name || "-"}</TableCell>
+                    <TableCell>{order?.last_name || "-"}</TableCell>
+                    <TableCell>{order?.job_company_name || "-"}</TableCell>
+                    <TableCell>
+                      {order?.job_title_levels?.join("") || "-"}
+                    </TableCell>
+                    <TableCell>{order?.job_title_role || "-"}</TableCell>
+                    <TableCell>{order?.work_email || "-"}</TableCell>
+                    <TableCell>{order?.mobile_phone || "-"}</TableCell>
+                    <TableCell>{order?.linkedin_username || "-"}</TableCell>
+                    <TableCell>{order?.countries?.join(",") || "-"}</TableCell>
+                    <TableCell>
+                      <Button
+                        onClick={() => {
+                          saveToList(order);
+                        }}
+                      >
+                        Save
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
               {/* {emptyRows > 0 && (
                 <TableRow style={{ height: 53 * emptyRows }}>
                   <TableCell colSpan={6} />
