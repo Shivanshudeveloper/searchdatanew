@@ -1,16 +1,14 @@
 import React, { useState } from "react";
 
 import { Helmet } from "react-helmet";
-import {
-  Box,
-  Container,
-  Typography,
-} from "@material-ui/core";
-import AppBar from '@material-ui/core/AppBar';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
-import { makeStyles } from '@material-ui/core/styles';
-import PropTypes from 'prop-types';
+import { Box, Container, Typography } from "@material-ui/core";
+import AppBar from "@material-ui/core/AppBar";
+import Tabs from "@material-ui/core/Tabs";
+import Tab from "@material-ui/core/Tab";
+import { makeStyles } from "@material-ui/core/styles";
+import PropTypes from "prop-types";
+import OrderDetailsEnrichment from "../components/orders/OrderDetailsEnrichment";
+
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
 
@@ -40,7 +38,7 @@ TabPanel.propTypes = {
 function a11yProps(index) {
   return {
     id: `simple-tab-${index}`,
-    'aria-controls': `simple-tabpanel-${index}`,
+    "aria-controls": `simple-tabpanel-${index}`,
   };
 }
 
@@ -52,7 +50,6 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const Tickets = () => {
-
   const classes = useStyles();
   const [value, setValue] = React.useState(0);
 
@@ -93,24 +90,15 @@ const Tickets = () => {
               onChange={handleChange}
               aria-label="simple tabs example"
             >
-              <Tab label="Overview" {...a11yProps(0)} />
-              <Tab label="CSV Enrichment" {...a11yProps(1)} />
-              <Tab label="API Enrichment" {...a11yProps(2)} />
-              <Tab label="CRM Enrichment" {...a11yProps(3)} />
+              <Tab label="CSV Enrichment" {...a11yProps(0)} />
+              <Tab label="API Enrichment" {...a11yProps(1)} />
             </Tabs>
           </AppBar>
+
           <TabPanel value={value} index={0}>
-            
+            <OrderDetailsEnrichment />
           </TabPanel>
-          <TabPanel value={value} index={1}>
-            
-          </TabPanel>
-          <TabPanel value={value} index={2}>
-            
-          </TabPanel>
-          <TabPanel value={value} index={3}>
-            
-          </TabPanel>
+          <TabPanel value={value} index={1}></TabPanel>
         </Container>
       </Box>
     </>
