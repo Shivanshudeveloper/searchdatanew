@@ -15,6 +15,8 @@ import Commision from "./pages/Commision";
 import Services from "./pages/Services";
 import Subscription from "./pages/Subscription";
 import Tickets from "./pages/Tickets";
+import Translate from "./pages/Translate";
+import Roles from "./pages/Roles";
 import { auth } from "./firebase";
 
 const user = auth.currentUser;
@@ -24,27 +26,29 @@ const routes = [
     path: "app",
     element: <DashboardLayout />,
     children: [
-      { path: "dashboard", element: <Dashboard /> },
-      { path: "subscriptions", element: <Subscription /> },
-      { path: "invoices", element: <Invoices /> },
-      { path: "search", element: <Orders /> },
-      { path: "commisions", element: <Commision /> },
-      { path: "campaign", element: <Services /> },
-      { path: "enrich", element: <Tickets /> },
-      { path: "account", element: <Account /> },
-      { path: "settings", element: <Settings /> },
-      { path: "*", element: <Navigate to="/404" /> },
+      {path: "dashboard", element: <Dashboard />},
+      {path: "subscriptions", element: <Subscription />},
+      {path: "invoices", element: <Invoices />},
+      {path: "search", element: <Orders />},
+      {path: "commisions", element: <Commision />},
+      {path: "campaign", element: <Services />},
+      {path: "enrich", element: <Tickets />},
+      {path: "account", element: <Account />},
+      {path: "settings", element: <Settings />},
+      {path: "translate", element: <Translate />},
+      {path: "roles", element: <Roles />},
+      {path: "*", element: <Navigate to="/404" />},
     ],
   },
   {
     path: "/",
     element: <MainLayout />,
     children: [
-      { path: "login", element: <Login /> },
-      { path: "register", element: <Register /> },
-      { path: "404", element: <NotFound /> },
-      { path: "/", element: <Navigate to="/app/dashboard" /> },
-      { path: "*", element: <Navigate to="/404" /> },
+      {path: "login", element: <Login />},
+      {path: "register", element: <Register />},
+      {path: "404", element: <NotFound />},
+      {path: "/", element: <Navigate to="/app/dashboard" />},
+      {path: "*", element: <Navigate to="/404" />},
     ],
   },
 ];

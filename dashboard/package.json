@@ -26,11 +26,13 @@
     ]
   },
   "dependencies": {
-    "@emotion/react": "^11.1.5",
-    "@emotion/styled": "^11.1.5",
+    "@emotion/react": "^11.5.0",
+    "@emotion/styled": "^11.3.0",
     "@material-ui/core": "^5.0.0-alpha.28",
     "@material-ui/icons": "^5.0.0-alpha.28",
     "@material-ui/styles": "^4.10.0",
+    "@mui/material": "^5.1.0",
+    "@mui/x-data-grid": "^4.0.2",
     "axios": "^0.22.0",
     "chart.js": "^2.9.4",
     "clsx": "^1.1.1",
