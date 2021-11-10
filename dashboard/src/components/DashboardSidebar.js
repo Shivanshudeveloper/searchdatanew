@@ -18,6 +18,9 @@ import NavItem from "./NavItem";
 import HomeIcon from "@material-ui/icons/Home";
 import SearchIcon from "@material-ui/icons/Search";
 import SettingsIcon from "@material-ui/icons/Settings";
+import TranslateIcon from "@material-ui/icons/Translate";
+import SupervisorAccountIcon from "@material-ui/icons/SupervisorAccount";
+
 const user = {
   avatar: "/static/images/avatars/avatar_6.png",
   jobTitle: "",
@@ -49,6 +52,16 @@ const items = [
     href: "/app/account",
     icon: SettingsIcon,
     title: "Settings",
+  },
+  {
+    href: "/app/roles",
+    icon: SupervisorAccountIcon,
+    title: "Roles",
+  },
+  {
+    href: "/app/translate",
+    icon: TranslateIcon,
+    title: "Translations",
   },
 ];
 
