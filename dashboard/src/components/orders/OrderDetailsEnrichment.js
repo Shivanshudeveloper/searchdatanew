@@ -28,7 +28,6 @@ import {
   Checkbox,
   Container,
 } from "@material-ui/core";
-import { alpha } from "@material-ui/core/styles";
 
 import FirstPageIcon from "@material-ui/icons/FirstPage";
 import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
