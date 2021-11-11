@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, {useState, useEffect} from "react";
 
 import PropTypes from "prop-types";
-import { useTheme } from "@material-ui/styles";
+import {useTheme} from "@material-ui/styles";
 
 import PerfectScrollbar from "react-perfect-scrollbar";
 import {
@@ -28,7 +28,7 @@ import {
   Checkbox,
   Container,
 } from "@material-ui/core";
-import { alpha } from "@material-ui/core/styles";
+import {alpha} from "@mui/material/styles";
 
 import FirstPageIcon from "@material-ui/icons/FirstPage";
 import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
@@ -40,12 +40,12 @@ import FilterListIcon from "@material-ui/icons/FilterList";
 import SearchIcon from "@material-ui/icons/Search";
 
 import axios from "axios";
-import { API_SERVICE } from "../../URI";
+import {API_SERVICE} from "../../URI";
 
 const OrderDetails = () => {
   function TablePaginationActions(props) {
     const theme = useTheme();
-    const { count, page, rowsPerPage, onPageChange } = props;
+    const {count, page, rowsPerPage, onPageChange} = props;
 
     const handleBackButtonClick = (event) => {
       onPageChange(event, page - 1);
@@ -56,7 +56,7 @@ const OrderDetails = () => {
     };
 
     return (
-      <Box sx={{ flexShrink: 0, ml: 2.5 }}>
+      <Box sx={{flexShrink: 0, ml: 2.5}}>
         <IconButton
           onClick={handleBackButtonClick}
           disabled={page === 0}
@@ -238,13 +238,13 @@ const OrderDetails = () => {
   const isSelected = (name) => selected.indexOf(name) !== -1;
 
   const EnhancedTableToolbar = (props) => {
-    const { numSelected } = props;
+    const {numSelected} = props;
 
     return (
       <Toolbar
         sx={{
-          pl: { sm: 2 },
-          pr: { xs: 1, sm: 1 },
+          pl: {sm: 2},
+          pr: {xs: 1, sm: 1},
           ...(numSelected > 0 && {
             bgcolor: (theme) =>
               alpha(
@@ -256,7 +256,7 @@ const OrderDetails = () => {
       >
         {numSelected > 0 ? (
           <Typography
-            sx={{ flex: "1 1 100%" }}
+            sx={{flex: "1 1 100%"}}
             color="inherit"
             variant="subtitle1"
             component="div"
@@ -265,7 +265,7 @@ const OrderDetails = () => {
           </Typography>
         ) : (
           <Typography
-            sx={{ flex: "1 1 100%" }}
+            sx={{flex: "1 1 100%"}}
             variant="h6"
             id="tableTitle"
             component="div"
@@ -316,7 +316,7 @@ const OrderDetails = () => {
     setOrders([]);
     if (searchField !== "") {
       axios
-        .post(`${API_SERVICE}/search_users/`, { searchField })
+        .post(`${API_SERVICE}/search_users/`, {searchField})
         .then((res) => {
           handleCloseDialog();
           setSearchField("");
@@ -340,7 +340,7 @@ const OrderDetails = () => {
 
   return (
     <Card>
-      <Container maxWidth={false} style={{ padding: "0 !important" }}>
+      <Container maxWidth={false} style={{padding: "0 !important"}}>
         <div
           style={{
             display: "flex",
@@ -348,7 +348,7 @@ const OrderDetails = () => {
             alignItems: "center",
           }}
         >
-          <Typography variant="h4" sx={{ my: "20px" }}>
+          <Typography variant="h4" sx={{my: "20px"}}>
             Search
           </Typography>
           <div>
@@ -381,13 +381,13 @@ const OrderDetails = () => {
             alignItems: "center",
           }}
         >
-          <Typography style={{ marginLeft: "20px", marginTop: "10px" }}>
+          <Typography style={{marginLeft: "20px", marginTop: "10px"}}>
             {isFilter && <>Number of data found : {orders?.length}</>}
           </Typography>
           <div>
             <Button
               variant="contained"
-              style={{ float: "right", marginRight: "35px", marginTop: "20px" }}
+              style={{float: "right", marginRight: "35px", marginTop: "20px"}}
               color="primary"
               startIcon={<FilterListIcon />}
               onClick={handleClickOpenDialog}
@@ -414,7 +414,7 @@ const OrderDetails = () => {
           </div>
         </div>
         <EnhancedTableToolbar numSelected={selected.length} />
-        <Box sx={{ minWidth: 800 }}>
+        <Box sx={{minWidth: 800}}>
           <Table>
             <TableHead>
               <TableRow>
@@ -482,12 +482,7 @@ const OrderDetails = () => {
               <TableFooter>
                 <TableRow>
                   <TablePagination
-                    rowsPerPageOptions={[
-                      5,
-                      10,
-                      25,
-                      { label: "All", value: -1 },
-                    ]}
+                    rowsPerPageOptions={[5, 10, 25, {label: "All", value: -1}]}
                     count={17000}
                     rowsPerPage={rowsPerPage}
                     page={page}
@@ -518,44 +513,40 @@ const OrderDetails = () => {
           <div>
             <TextField
               id="outlined-basic"
-              style={{ marginBottom: "18px" }}
+              style={{marginBottom: "18px"}}
               defaultValue="Name"
               value={search.name}
-              onChange={(e) => setSearch({ ...search, name: e.target.value })}
+              onChange={(e) => setSearch({...search, name: e.target.value})}
               fullWidth
               label="Name"
               variant="outlined"
             />
             <TextField
               id="outlined-basic"
-              style={{ marginBottom: "18px" }}
+              style={{marginBottom: "18px"}}
               defaultValue="LinkeIn"
               value={search.linkedin}
-              onChange={(e) =>
-                setSearch({ ...search, linkedin: e.target.value })
-              }
+              onChange={(e) => setSearch({...search, linkedin: e.target.value})}
               fullWidth
               label="Linkedin"
               variant="outlined"
             />
             <TextField
               id="outlined-basic"
-              style={{ marginBottom: "18px" }}
+              style={{marginBottom: "18px"}}
               defaultValue="Company"
               value={search.company}
-              onChange={(e) =>
-                setSearch({ ...search, company: e.target.value })
-              }
+              onChange={(e) => setSearch({...search, company: e.target.value})}
               fullWidth
               label="Company"
               variant="outlined"
             />
             <TextField
               id="outlined-basic"
-              style={{ marginBottom: "18px" }}
+              style={{marginBottom: "18px"}}
               defaultValue="Designation"
               value={search.design}
-              onChange={(e) => setSearch({ ...search, design: e.target.value })}
+              onChange={(e) => setSearch({...search, design: e.target.value})}
               fullWidth
               label="Designation"
               variant="outlined"
@@ -574,20 +565,20 @@ const OrderDetails = () => {
             /> */}
             <TextField
               id="outlined-basic"
-              style={{ marginBottom: "18px" }}
+              style={{marginBottom: "18px"}}
               defaultValue="Email"
               value={search.email}
-              onChange={(e) => setSearch({ ...search, email: e.target.value })}
+              onChange={(e) => setSearch({...search, email: e.target.value})}
               fullWidth
               label="Email"
               variant="outlined"
             />
             <TextField
               id="outlined-basic"
-              style={{ marginBottom: "18px" }}
+              style={{marginBottom: "18px"}}
               defaultValue="Phone"
               value={search.phone}
-              onChange={(e) => setSearch({ ...search, phone: e.target.value })}
+              onChange={(e) => setSearch({...search, phone: e.target.value})}
               fullWidth
               label="Phone"
               variant="outlined"
