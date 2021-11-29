@@ -17,6 +17,7 @@ import Subscription from "./pages/Subscription";
 import Tickets from "./pages/Tickets";
 import Translate from "./pages/Translate";
 import Roles from "./pages/Roles";
+import Emails from "./pages/Emails";
 import { auth } from "./firebase";
 
 const user = auth.currentUser;
@@ -37,6 +38,7 @@ const routes = [
       {path: "settings", element: <Settings />},
       {path: "translate", element: <Translate />},
       {path: "roles", element: <Roles />},
+      {path: "emailcampagin", element: <Emails />},
       {path: "*", element: <Navigate to="/404" />},
     ],
   },

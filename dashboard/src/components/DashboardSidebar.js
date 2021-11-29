@@ -20,6 +20,7 @@ import SearchIcon from "@material-ui/icons/Search";
 import SettingsIcon from "@material-ui/icons/Settings";
 import TranslateIcon from "@material-ui/icons/Translate";
 import SupervisorAccountIcon from "@material-ui/icons/SupervisorAccount";
+import EmailIcon from '@material-ui/icons/Email';
 
 const user = {
   avatar: "/static/images/avatars/avatar_6.png",
@@ -63,6 +64,11 @@ const items = [
     icon: TranslateIcon,
     title: "Translations",
   },
+  {
+    href: "/app/emailcampagin",
+    icon: EmailIcon,
+    title: "Emails",
+  }
 ];
 
 const DashboardSidebar = ({ onMobileClose, openMobile }) => {
