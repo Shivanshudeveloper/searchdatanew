@@ -5,7 +5,6 @@ export const CampaignReducer = (state = { campaignItems: [] }, action) => {
     // create content cases
     case types.CREATE_CAMPAIGN: {
       const item = action.payload
-      console.log(item)
       return {
         ...state,
         campaignItems: [...state.campaignItems, item],

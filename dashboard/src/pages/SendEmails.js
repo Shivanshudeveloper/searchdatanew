@@ -1,12 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { Typography, Box, Button, Stack } from '@material-ui/core'
+import { Typography, Box, Button, Stack, Grid } from '@material-ui/core'
 import EmailEditor from 'react-email-editor'
 import axios from 'axios'
 import SnackMessage from 'src/components/SnackMessage'
-import { getCampaignDetails } from '../store/actions/campaignAction'
+import {
+  getCampaignDetails,
+  updateCampaign,
+} from '../store/actions/campaignAction'
 import SavedListTable from 'src/components/sendEmails/SavedListTable'
+import DetailsCard from 'src/components/sendEmails/DetailsCard'
 import { API_SERVICE } from 'src/config/url'
 
 const CampaignDetail = () => {
@@ -96,8 +100,6 @@ const CampaignDetail = () => {
         return
       }
 
-      console.log(to)
-
       const subject = campaignDetails.campaignName
 
       const config = {
@@ -121,6 +123,9 @@ const CampaignDetail = () => {
       setMessage(response.data.msg)
       setVariant('success')
       setSnackOpen(true)
+      dispatch(
+        updateCampaign(campaignDetails._id, campaignDetails.mailSend + 1)
+      )
     } catch (error) {
       setMessage(error.message)
       setVariant('error')
@@ -130,10 +135,44 @@ const CampaignDetail = () => {
 
   return (
     <div style={{ margin: 50 }}>
-      <Typography variant='h1'>{campaignDetails.campaignName}</Typography>
+      {campaignDetails && (
+        <>
+          <Typography variant='h1'>{campaignDetails.campaignName}</Typography>
+          <Grid sx={{ my: 4 }} container>
+            <Grid item sm={6} md={3} sx={{ px: 1.5, py: 1.2 }}>
+              <DetailsCard
+                title='Mail Delivered'
+                count={campaignDetails.mailDelivered}
+                bg='#00bfff'
+              />
+            </Grid>
+            <Grid item sm={6} md={3} sx={{ px: 1.5, py: 1.2 }}>
+              <DetailsCard
+                title='Mail Send'
+                count={campaignDetails.mailSend}
+                bg='green'
+              />
+            </Grid>
+            <Grid item sm={6} md={3} sx={{ px: 1.5, py: 1.2 }}>
+              <DetailsCard
+                title='Mail Opened'
+                count={campaignDetails.Opened}
+                bg='orange'
+              />
+            </Grid>
+            <Grid item sm={6} md={3} sx={{ px: 1.5, py: 1.2 }}>
+              <DetailsCard
+                title='Not Delivered'
+                count={campaignDetails.notDelivered}
+                bg='#ff4040'
+              />
+            </Grid>
+          </Grid>
+        </>
+      )}
       <Box
         sx={{
-          mt: 10,
+          mt: 5,
           display: 'flex',
           justifyContent: 'center',
         }}

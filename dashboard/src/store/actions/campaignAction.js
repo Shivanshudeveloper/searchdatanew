@@ -18,7 +18,8 @@ export const createCampaign =
       }
 
       const { data } = await axios.post(
-        `${API_SERVICE}/api/v1/main/campaign/create`,
+        //`${API_SERVICE}/api/v1/main/campaign/create`,
+        `http://localhost:5000/api/v1/main/campaign/create`,
         body,
         config
       )
@@ -79,6 +80,41 @@ export const deleteCampaign = (id) => async (dispatch, getState) => {
   } catch (error) {
     dispatch({
       type: types.DELETE_CAMPAIGN_FAIL,
+      payload:
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message,
+    })
+  }
+}
+
+// @ updating campaign
+export const updateCampaign = (id, count) => async (dispatch) => {
+  try {
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }
+
+    const body = {
+      id,
+      count,
+    }
+
+    const { data } = await axios.put(
+      `http://localhost:5000/api/v1/main/campaign/update`,
+      body,
+      config
+    )
+
+    dispatch({
+      type: types.GET_CAMPAIGN_DETAILS,
+      payload: data,
+    })
+  } catch (error) {
+    dispatch({
+      type: types.GET_CAMPAIGN_DETAILS_FAIL,
       payload:
         error.response && error.response.data.message
           ? error.response.data.message

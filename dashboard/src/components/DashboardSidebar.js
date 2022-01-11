@@ -39,16 +39,16 @@ const items = [
     icon: SearchIcon,
     title: 'Search',
   },
-  {
-    href: '/app/campaign',
-    icon: RoomServiceIcon,
-    title: 'Campaigns',
-  },
-  {
-    href: '/app/enrich',
-    icon: ConfirmationNumberIcon,
-    title: 'Enrich',
-  },
+  // {
+  //   href: '/app/campaign',
+  //   icon: RoomServiceIcon,
+  //   title: 'Campaigns',
+  // },
+  // {
+  //   href: '/app/enrich',
+  //   icon: ConfirmationNumberIcon,
+  //   title: 'Enrich',
+  // },
   {
     href: '/app/account',
     icon: SettingsIcon,
