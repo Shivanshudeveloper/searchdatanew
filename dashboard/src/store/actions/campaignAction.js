@@ -103,7 +103,7 @@ export const updateCampaign = (id, count) => async (dispatch) => {
     }
 
     const { data } = await axios.put(
-      `http://localhost:5000/api/v1/main/campaign/update`,
+      `${API_SERVICE}/api/v1/main/campaign/update`,
       body,
       config
     )

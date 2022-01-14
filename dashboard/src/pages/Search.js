@@ -22,14 +22,23 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Grid,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
 } from '@material-ui/core'
-import { ArrowForwardIos, ArrowBackIos } from '@material-ui/icons'
+import {
+  ArrowForwardIos,
+  ArrowBackIos,
+  ExpandMore as ExpandMoreIcon,
+} from '@material-ui/icons'
 import { Search as SearchIcon } from 'react-feather'
 import { filter, parseInt } from 'lodash'
 import axios from 'axios'
 import SnackMessage from 'src/components/SnackMessage'
 import { API_SERVICE } from 'src/config/url'
 import { countries } from '../utils/countriesName'
+import FilterAccordion from 'src/components/search/FilterAccordion'
 
 const Search = () => {
   const [page, setPage] = useState(1)
@@ -42,7 +51,12 @@ const Search = () => {
   const [variant, setVariant] = useState(null)
   const [message, setMessage] = useState(null)
   const [snackOpen, setSnackOpen] = useState(false)
-  const [country, setCountry] = useState('All Country')
+  const [firstNameFilter, setFirstNameFilter] = useState('')
+  const [lastNameFilter, setLastNameFilter] = useState('')
+  const [jobFilter, setJobFilter] = useState('')
+  const [companyFilter, setCompanyFilter] = useState('')
+  const [locationFilter, setLocationFilter] = useState('')
+  const [industryFilter, setIndustryFilter] = useState('')
 
   const count = 100
 
@@ -64,7 +78,6 @@ const Search = () => {
   useEffect(() => {
     if (fetchedData !== null) {
       const currData = fetchedData.slice(start, start + 15)
-      console.log('here')
       setTableData(currData)
     }
   }, [page, fetchedData])
@@ -154,186 +167,297 @@ const Search = () => {
     setFilteredTableData(Filter)
   }
 
-  const applyFilter = async (e) => {
-    setCountry(e.target.value)
+  // useEffect(() => {
+  //   if (
+  //     firstNameFilter === '' &&
+  //     lastNameFilter === '' &&
+  //     jobFilter === '' &&
+  //     companyFilter === '' &&
+  //     locationFilter === '' &&
+  //     industryFilter === ''
+  //   ) {
+  //     setFilteredTableData([])
+  //     return
+  //   }
 
-    if (e.target.value === 'All Country') {
-      const { data } = await axios.get(
-        `${API_SERVICE}/api/v1/main/random/${count}`
-      )
-      setFetchedData(data)
+  //   let data = [...tableData]
+
+  //   let Filter = data.filter(
+  //     (dat) =>
+  //       dat.firstName.toLowerCase().includes(firstNameFilter.toLowerCase()) &&
+  //       dat.lastName.toLowerCase().includes(lastNameFilter.toLowerCase()) &&
+  //       dat.jobRole.toLowerCase().includes(jobFilter.toLowerCase()) &&
+  //       dat.company.toLowerCase().includes(companyFilter.toLowerCase()) &&
+  //       dat.country.toLowerCase().includes(locationFilter.toLowerCase()) &&
+  //       dat.industry.toLowerCase().includes(industryFilter.toLowerCase())
+  //   )
+
+  //   setFilteredTableData(Filter)
+  // }, [
+  //   firstNameFilter,
+  //   lastNameFilter,
+  //   jobFilter,
+  //   companyFilter,
+  //   locationFilter,
+  //   industryFilter,
+  // ])
+
+  const applyFilter = async () => {
+    if (
+      firstNameFilter === '' &&
+      lastNameFilter === '' &&
+      jobFilter === '' &&
+      companyFilter === '' &&
+      locationFilter === '' &&
+      industryFilter === ''
+    ) {
+      setMessage('Select Atleat one filter to apply')
+      setVariant('error')
+      setSnackOpen(true)
       return
     }
-
-    console.log('here')
-
     try {
       const { data } = await axios.get(
-        `${API_SERVICE}/api/v1/main/filter/${count}/${e.target.value}`
+        `${API_SERVICE}/api/v1/main/filter/10?firstName=${firstNameFilter}
+        &lastName=${lastNameFilter}&country=${locationFilter}&jobRole=${jobFilter}
+        &company=${companyFilter}&industry=${industryFilter}`
       )
+
       setFetchedData(data)
     } catch (error) {
-      console.log(`Error: ${error.message}`)
+      setMessage(error)
+      setVariant('error')
+      setSnackOpen(true)
     }
   }
 
   return (
-    <Box sx={{ py: 8, px: 2 }}>
-      <Stack direction='row' alignItems='center'>
-        <TextField
-          fullWidth
-          type='text'
-          placeholder='Search '
-          variant='outlined'
-          sx={{ backgroundColor: 'white' }}
-          value={text}
-          onChange={handleChange}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position='start'>
-                <SvgIcon fontSize='small' color='action'>
-                  <SearchIcon />
-                </SvgIcon>
-              </InputAdornment>
-            ),
-          }}
-        />
-        <Typography sx={{ ml: 3, width: 100 }} variant='h5' component='h1'>
-          Filter By:{' '}
-        </Typography>
-        <FormControl variant='standard' sx={{ width: 400, ml: 3 }}>
-          <InputLabel>Select Country</InputLabel>
-          <Select
-            label='Select Country'
-            value={country}
-            onChange={(e) => applyFilter(e)}
-          >
-            <MenuItem value={'All Country'}>All Country</MenuItem>
-            {countries.map((x) => (
-              <MenuItem value={x.name}>{x.name}</MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Stack>
+    <>
+      <Grid container>
+        <Grid item sm={2.5}>
+          <Box sx={{ py: 2, pl: 2 }}>
+            <FilterAccordion
+              filterValue={firstNameFilter}
+              setFilter={setFirstNameFilter}
+              title='First Name'
+            />
+            <FilterAccordion
+              filterValue={lastNameFilter}
+              setFilter={setLastNameFilter}
+              title='Last Name'
+            />
+            <FilterAccordion
+              filterValue={jobFilter}
+              setFilter={setJobFilter}
+              title='Job Titles'
+            />
+            <FilterAccordion
+              filterValue={companyFilter}
+              setFilter={setCompanyFilter}
+              title='Company'
+            />
+            <FilterAccordion
+              filterValue={locationFilter}
+              setFilter={setLocationFilter}
+              title='Location'
+            />
+            <FilterAccordion
+              filterValue={industryFilter}
+              setFilter={setIndustryFilter}
+              title='Industry'
+            />
+            <Button
+              sx={{ my: 2, py: 1.3 }}
+              fullWidth
+              variant='contained'
+              onClick={() => applyFilter()}
+            >
+              Apply Filter
+            </Button>
+          </Box>
+        </Grid>
 
-      <Card sx={{ py: 4, mt: 5 }}>
-        <CardContent>
-          <TableContainer component={Paper}>
-            <Table sx={{ minWidth: 650 }} aria-label='simple table'>
-              <TableHead>
-                <TableRow>
-                  <TableCell></TableCell>
-                  <TableCell>First Name</TableCell>
-                  <TableCell align='center'>Last Name</TableCell>
-                  <TableCell align='center'>Company</TableCell>
-                  <TableCell align='center'>Job Role</TableCell>
-                  <TableCell align='center'>Email</TableCell>
-                  <TableCell align='center'>Phone</TableCell>
-                  <TableCell align='center'>Linkedin</TableCell>
-                  <TableCell align='center'>Country</TableCell>
-                  <TableCell></TableCell>
-                </TableRow>
-              </TableHead>
+        <Grid item sm={9.5}>
+          <Box sx={{ py: 2, px: 2 }}>
+            <TextField
+              fullWidth
+              type='text'
+              placeholder='Search '
+              variant='outlined'
+              sx={{ backgroundColor: 'white' }}
+              value={text}
+              onChange={handleChange}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position='start'>
+                    <SvgIcon fontSize='small' color='action'>
+                      <SearchIcon />
+                    </SvgIcon>
+                  </InputAdornment>
+                ),
+              }}
+            />
 
-              <TableBody>
-                {filteredTableData.length === 0 && text === ''
-                  ? tableData.map((row) => (
-                      <TableRow
-                        key={row.email}
-                        sx={{
-                          '&:last-child td, &:last-child th': { border: 0 },
-                        }}
-                      >
-                        <TableCell padding='checkbox'>
-                          <Checkbox color='primary' />
-                        </TableCell>
-                        <TableCell component='th' scope='row'>
-                          {row.firstName}
-                        </TableCell>
-                        <TableCell align='center'>{row.lastName}</TableCell>
-                        <TableCell align='center'>{row.company}</TableCell>
-                        <TableCell align='center'>{row.jobRole}</TableCell>
-                        <TableCell align='center'>{row.email}</TableCell>
-                        <TableCell align='center'>{row.phoneNumber}</TableCell>
-                        <TableCell align='center'>
-                          {row.linkedinProfile}
-                        </TableCell>
-                        <TableCell align='center'>{row.country}</TableCell>
-                        <TableCell align='center'>
-                          <Button onClick={() => addtoSaveList(row)}>
-                            Save
-                          </Button>
-                        </TableCell>
+            <Card sx={{ py: 4, mt: 5 }}>
+              <CardContent>
+                <TableContainer component={Paper}>
+                  <Table sx={{ minWidth: 650 }} aria-label='simple table'>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell></TableCell>
+                        <TableCell>First Name</TableCell>
+                        <TableCell align='center'>Last Name</TableCell>
+                        <TableCell align='center'>Company</TableCell>
+                        <TableCell align='center'>Job Role</TableCell>
+                        <TableCell align='center'>Industry</TableCell>
+                        <TableCell align='center'>Email</TableCell>
+                        <TableCell align='center'>Phone</TableCell>
+                        <TableCell align='center'>Linkedin</TableCell>
+                        <TableCell align='center'>Country</TableCell>
+                        <TableCell></TableCell>
                       </TableRow>
-                    ))
-                  : filteredTableData.map((row) => (
-                      <TableRow
-                        key={row.email}
-                        sx={{
-                          '&:last-child td, &:last-child th': { border: 0 },
-                        }}
+                    </TableHead>
+
+                    <TableBody>
+                      {filteredTableData.length === 0 && text === ''
+                        ? tableData.map((row) => (
+                            <TableRow
+                              key={row.email}
+                              sx={{
+                                '&:last-child td, &:last-child th': {
+                                  border: 0,
+                                },
+                              }}
+                            >
+                              <TableCell padding='checkbox'>
+                                <Checkbox color='primary' />
+                              </TableCell>
+                              <TableCell component='th' scope='row'>
+                                {row.firstName}
+                              </TableCell>
+                              <TableCell align='center'>
+                                {row.lastName}
+                              </TableCell>
+                              <TableCell align='center'>
+                                {row.company}
+                              </TableCell>
+                              <TableCell align='center'>
+                                {row.jobRole}
+                              </TableCell>
+                              <TableCell align='center'>
+                                {row.industry}
+                              </TableCell>
+                              <TableCell align='center'>{row.email}</TableCell>
+                              <TableCell align='center'>
+                                {row.phoneNumber}
+                              </TableCell>
+                              <TableCell align='center'>
+                                {row.linkedinProfile}
+                              </TableCell>
+                              <TableCell align='center'>
+                                {row.country}
+                              </TableCell>
+                              <TableCell align='center'>
+                                <Button onClick={() => addtoSaveList(row)}>
+                                  Save
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        : filteredTableData.map((row) => (
+                            <TableRow
+                              key={row.email}
+                              sx={{
+                                '&:last-child td, &:last-child th': {
+                                  border: 0,
+                                },
+                              }}
+                            >
+                              <TableCell padding='checkbox'>
+                                <Checkbox color='primary' />
+                              </TableCell>
+                              <TableCell component='th' scope='row'>
+                                {row.firstName}
+                              </TableCell>
+                              <TableCell align='center'>
+                                {row.lastName}
+                              </TableCell>
+                              <TableCell align='center'>
+                                {row.company}
+                              </TableCell>
+                              <TableCell align='center'>
+                                {row.jobRole}
+                              </TableCell>
+                              <TableCell align='center'>
+                                {row.industry}
+                              </TableCell>
+                              <TableCell align='center'>{row.email}</TableCell>
+                              <TableCell align='center'>
+                                {row.phoneNumber}
+                              </TableCell>
+                              <TableCell align='center'>
+                                {row.linkedinProfile}
+                              </TableCell>
+                              <TableCell align='center'>
+                                {row.country}
+                              </TableCell>
+                              <TableCell align='center'>
+                                <Button onClick={() => addtoSaveList(row)}>
+                                  Save
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                    </TableBody>
+                  </Table>
+                  {filteredTableData.length === 0 && text !== '' ? (
+                    <center>
+                      <Typography
+                        sx={{ my: 3 }}
+                        color='textPrimary'
+                        variant='h2'
                       >
-                        <TableCell padding='checkbox'>
-                          <Checkbox color='primary' />
-                        </TableCell>
-                        <TableCell component='th' scope='row'>
-                          {row.firstName}
-                        </TableCell>
-                        <TableCell align='center'>{row.lastName}</TableCell>
-                        <TableCell align='center'>{row.company}</TableCell>
-                        <TableCell align='center'>{row.jobRole}</TableCell>
-                        <TableCell align='center'>{row.email}</TableCell>
-                        <TableCell align='center'>{row.phoneNumber}</TableCell>
-                        <TableCell align='center'>
-                          {row.linkedinProfile}
-                        </TableCell>
-                        <TableCell align='center'>{row.country}</TableCell>
-                        <TableCell align='center'>
-                          <Button onClick={() => addtoSaveList(row)}>
-                            Save
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-              </TableBody>
-            </Table>
-            {filteredTableData.length === 0 && text !== '' ? (
-              <center>
-                <Typography sx={{ my: 3 }} color='textPrimary' variant='h2'>
-                  Not Found
-                </Typography>
-              </center>
-            ) : null}
-          </TableContainer>
-        </CardContent>
-        <Stack direction='row' justifyContent='center' sx={{ mt: 4 }}>
-          {start === 0 ? (
-            <IconButton disabled sx={{ mr: 4 }} onClick={() => moveBack()}>
-              <ArrowBackIos />
-            </IconButton>
-          ) : (
-            <IconButton sx={{ mr: 4 }} onClick={() => moveBack()}>
-              <ArrowBackIos />
-            </IconButton>
-          )}
-          {page === totalPages ? (
-            <IconButton disabled onClick={() => moveForward()}>
-              <ArrowForwardIos />
-            </IconButton>
-          ) : (
-            <IconButton onClick={() => moveForward()}>
-              <ArrowForwardIos />
-            </IconButton>
-          )}
-        </Stack>
-      </Card>
-      <SnackMessage
-        variant={variant}
-        message={message}
-        snackOpen={snackOpen}
-        handleSnackClose={handleClose}
-      />
-    </Box>
+                        Not Found
+                      </Typography>
+                    </center>
+                  ) : null}
+                </TableContainer>
+              </CardContent>
+              <Stack direction='row' justifyContent='center' sx={{ mt: 4 }}>
+                {start === 0 ? (
+                  <IconButton
+                    disabled
+                    sx={{ mr: 4 }}
+                    onClick={() => moveBack()}
+                  >
+                    <ArrowBackIos />
+                  </IconButton>
+                ) : (
+                  <IconButton sx={{ mr: 4 }} onClick={() => moveBack()}>
+                    <ArrowBackIos />
+                  </IconButton>
+                )}
+                {page === totalPages ? (
+                  <IconButton disabled onClick={() => moveForward()}>
+                    <ArrowForwardIos />
+                  </IconButton>
+                ) : (
+                  <IconButton onClick={() => moveForward()}>
+                    <ArrowForwardIos />
+                  </IconButton>
+                )}
+              </Stack>
+            </Card>
+            <SnackMessage
+              variant={variant}
+              message={message}
+              snackOpen={snackOpen}
+              handleSnackClose={handleClose}
+            />
+          </Box>
+        </Grid>
+      </Grid>
+    </>
   )
 }
 
