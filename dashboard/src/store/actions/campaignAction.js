@@ -1,6 +1,6 @@
 import axios from 'axios'
 import * as types from '../constants'
-import { API_SERVICE } from 'src/config/url'
+import { API_SERVICE } from '../../config/url'
 
 // @creating campaign
 export const createCampaign =
@@ -18,8 +18,7 @@ export const createCampaign =
       }
 
       const { data } = await axios.post(
-        //`${API_SERVICE}/api/v1/main/campaign/create`,
-        `http://localhost:5000/api/v1/main/campaign/create`,
+        `${API_SERVICE}/api/v1/main/campaign/create`,
         body,
         config
       )
