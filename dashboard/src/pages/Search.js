@@ -17,28 +17,24 @@ import {
   Stack,
   InputAdornment,
   SvgIcon,
-  Typography,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   Grid,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
+  Dialog,
+  DialogContent,
+  DialogActions,
+  DialogContentText,
 } from '@material-ui/core'
-import {
-  ArrowForwardIos,
-  ArrowBackIos,
-  ExpandMore as ExpandMoreIcon,
-} from '@material-ui/icons'
+import { ArrowForwardIos, ArrowBackIos } from '@material-ui/icons'
 import { Search as SearchIcon } from 'react-feather'
 import { filter, parseInt } from 'lodash'
 import axios from 'axios'
 import SnackMessage from 'src/components/SnackMessage'
 import { API_SERVICE } from 'src/config/url'
-import { countries } from '../utils/countriesName'
 import FilterAccordion from 'src/components/search/FilterAccordion'
+import Slide from '@mui/material/Slide'
+
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction='up' ref={ref} {...props} />
+})
 
 const Search = () => {
   const [page, setPage] = useState(1)
@@ -51,6 +47,7 @@ const Search = () => {
   const [variant, setVariant] = useState(null)
   const [message, setMessage] = useState(null)
   const [snackOpen, setSnackOpen] = useState(false)
+  const [dialogOpen, setDialogOpen] = useState(false)
   const [firstNameFilter, setFirstNameFilter] = useState('')
   const [lastNameFilter, setLastNameFilter] = useState('')
   const [jobFilter, setJobFilter] = useState('')
@@ -63,6 +60,10 @@ const Search = () => {
   const userEmail = sessionStorage.getItem('userEmail')
     ? sessionStorage.getItem('userEmail')
     : null
+
+  const dialogClose = () => {
+    setDialogOpen(false)
+  }
 
   useEffect(() => {
     if (fetchedData !== null) {
@@ -146,62 +147,6 @@ const Search = () => {
     setSnackOpen(false)
   }
 
-  const handleChange = (e) => {
-    setText(e.target.value)
-
-    if (e.target.value === '') {
-      setFilteredTableData([])
-      return
-    }
-    console.log(e.target.value)
-    let data = [...tableData]
-
-    let Filter = data.filter(
-      (dat) =>
-        dat.lastName.toLowerCase().includes(e.target.value.toLowerCase()) ||
-        dat.firstName.toLowerCase().includes(e.target.value.toLowerCase()) ||
-        dat.company.toLowerCase().includes(e.target.value.toLowerCase()) ||
-        dat.country.toLowerCase().includes(e.target.value.toLowerCase())
-    )
-
-    setFilteredTableData(Filter)
-  }
-
-  // useEffect(() => {
-  //   if (
-  //     firstNameFilter === '' &&
-  //     lastNameFilter === '' &&
-  //     jobFilter === '' &&
-  //     companyFilter === '' &&
-  //     locationFilter === '' &&
-  //     industryFilter === ''
-  //   ) {
-  //     setFilteredTableData([])
-  //     return
-  //   }
-
-  //   let data = [...tableData]
-
-  //   let Filter = data.filter(
-  //     (dat) =>
-  //       dat.firstName.toLowerCase().includes(firstNameFilter.toLowerCase()) &&
-  //       dat.lastName.toLowerCase().includes(lastNameFilter.toLowerCase()) &&
-  //       dat.jobRole.toLowerCase().includes(jobFilter.toLowerCase()) &&
-  //       dat.company.toLowerCase().includes(companyFilter.toLowerCase()) &&
-  //       dat.country.toLowerCase().includes(locationFilter.toLowerCase()) &&
-  //       dat.industry.toLowerCase().includes(industryFilter.toLowerCase())
-  //   )
-
-  //   setFilteredTableData(Filter)
-  // }, [
-  //   firstNameFilter,
-  //   lastNameFilter,
-  //   jobFilter,
-  //   companyFilter,
-  //   locationFilter,
-  //   industryFilter,
-  // ])
-
   const applyFilter = async () => {
     if (
       firstNameFilter === '' &&
@@ -218,11 +163,29 @@ const Search = () => {
     }
     try {
       const { data } = await axios.get(
-        `${API_SERVICE}/api/v1/main/filter/10?firstName=${firstNameFilter}
+        `${API_SERVICE}/api/v1/main/filter/100?firstName=${firstNameFilter}
         &lastName=${lastNameFilter}&country=${locationFilter}&jobRole=${jobFilter}
         &company=${companyFilter}&industry=${industryFilter}`
       )
 
+      setFetchedData(data)
+    } catch (error) {
+      setMessage(error)
+      setVariant('error')
+      setSnackOpen(true)
+    }
+  }
+
+  const search = async () => {
+    try {
+      if (text.length <= 3) {
+        setDialogOpen(true)
+        return
+      }
+
+      const { data } = await axios.get(
+        `${API_SERVICE}/api/v1/main/filter/100?firstName=${text}`
+      )
       setFetchedData(data)
     } catch (error) {
       setMessage(error)
@@ -278,25 +241,35 @@ const Search = () => {
         </Grid>
 
         <Grid item sm={9.5}>
-          <Box sx={{ py: 2, px: 2 }}>
-            <TextField
-              fullWidth
-              type='text'
-              placeholder='Search '
-              variant='outlined'
-              sx={{ backgroundColor: 'white' }}
-              value={text}
-              onChange={handleChange}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position='start'>
-                    <SvgIcon fontSize='small' color='action'>
-                      <SearchIcon />
-                    </SvgIcon>
-                  </InputAdornment>
-                ),
-              }}
-            />
+          <Box sx={{ py: 2, px: 2, mr: 2 }}>
+            <Stack direction='row' alignItems='center'>
+              <TextField
+                fullWidth
+                type='text'
+                placeholder='Search '
+                variant='outlined'
+                sx={{ backgroundColor: 'white' }}
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position='start'>
+                      <SvgIcon fontSize='small' color='action'>
+                        <SearchIcon />
+                      </SvgIcon>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+
+              <Button
+                sx={{ px: 4, ml: 2, py: 1.2 }}
+                variant='contained'
+                onClick={() => search()}
+              >
+                Search
+              </Button>
+            </Stack>
 
             <Card sx={{ py: 4, mt: 5 }}>
               <CardContent>
@@ -319,7 +292,7 @@ const Search = () => {
                     </TableHead>
 
                     <TableBody>
-                      {filteredTableData.length === 0 && text === ''
+                      {tableData.length !== 0
                         ? tableData.map((row) => (
                             <TableRow
                               key={row.email}
@@ -410,17 +383,6 @@ const Search = () => {
                           ))}
                     </TableBody>
                   </Table>
-                  {filteredTableData.length === 0 && text !== '' ? (
-                    <center>
-                      <Typography
-                        sx={{ my: 3 }}
-                        color='textPrimary'
-                        variant='h2'
-                      >
-                        Not Found
-                      </Typography>
-                    </center>
-                  ) : null}
                 </TableContainer>
               </CardContent>
               <Stack direction='row' justifyContent='center' sx={{ mt: 4 }}>
@@ -454,6 +416,21 @@ const Search = () => {
               snackOpen={snackOpen}
               handleSnackClose={handleClose}
             />
+            <Dialog
+              open={dialogOpen}
+              TransitionComponent={Transition}
+              keepMounted
+              onClose={dialogClose}
+            >
+              <DialogContent
+                sx={{ width: 300, display: 'flex', justifyContent: 'center' }}
+              >
+                <DialogContentText>No Data Found</DialogContentText>
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={() => setDialogOpen(false)}>Close</Button>
+              </DialogActions>
+            </Dialog>
           </Box>
         </Grid>
       </Grid>
