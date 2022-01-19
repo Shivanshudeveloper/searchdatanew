@@ -55,7 +55,7 @@ const Search = () => {
   const [locationFilter, setLocationFilter] = useState('')
   const [industryFilter, setIndustryFilter] = useState('')
 
-  const count = 100
+  const count = 1500
 
   const userEmail = sessionStorage.getItem('userEmail')
     ? sessionStorage.getItem('userEmail')
@@ -163,7 +163,7 @@ const Search = () => {
     }
     try {
       const { data } = await axios.get(
-        `${API_SERVICE}/api/v1/main/filter/100?firstName=${firstNameFilter}
+        `${API_SERVICE}/api/v1/main/filter/${count}?firstName=${firstNameFilter}
         &lastName=${lastNameFilter}&country=${locationFilter}&jobRole=${jobFilter}
         &company=${companyFilter}&industry=${industryFilter}`
       )
@@ -184,7 +184,7 @@ const Search = () => {
       }
 
       const { data } = await axios.get(
-        `${API_SERVICE}/api/v1/main/filter/100?firstName=${text}`
+        `${API_SERVICE}/api/v1/main/filter/${count}?firstName=${text}`
       )
       setFetchedData(data)
     } catch (error) {
