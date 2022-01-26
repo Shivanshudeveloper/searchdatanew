@@ -22,6 +22,8 @@ import {
   DialogContent,
   DialogActions,
   DialogContentText,
+  Typography,
+  TablePagination,
 } from '@material-ui/core'
 import { ArrowForwardIos, ArrowBackIos } from '@material-ui/icons'
 import { Search as SearchIcon } from 'react-feather'
@@ -31,22 +33,25 @@ import SnackMessage from 'src/components/SnackMessage'
 import { API_SERVICE } from 'src/config/url'
 import FilterAccordion from 'src/components/search/FilterAccordion'
 import Slide from '@mui/material/Slide'
+import { CircularProgress } from '@mui/material'
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction='up' ref={ref} {...props} />
 })
 
 const Search = () => {
-  const [page, setPage] = useState(1)
+  const [page, setPage] = useState(0)
+  const [rowsPerPage, setRowsPerPage] = useState(15)
   const [start, setStart] = useState(0)
   const [tableData, setTableData] = useState([])
   const [filteredTableData, setFilteredTableData] = useState([])
   const [text, setText] = useState('')
   const [totalPages, setTotalPages] = useState(0)
-  const [fetchedData, setFetchedData] = useState(null)
+  const [fetchedData, setFetchedData] = useState([])
   const [variant, setVariant] = useState(null)
   const [message, setMessage] = useState(null)
   const [snackOpen, setSnackOpen] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [firstNameFilter, setFirstNameFilter] = useState('')
   const [lastNameFilter, setLastNameFilter] = useState('')
@@ -55,7 +60,7 @@ const Search = () => {
   const [locationFilter, setLocationFilter] = useState('')
   const [industryFilter, setIndustryFilter] = useState('')
 
-  const count = 1500
+  const count = 10000
 
   const userEmail = sessionStorage.getItem('userEmail')
     ? sessionStorage.getItem('userEmail')
@@ -65,44 +70,53 @@ const Search = () => {
     setDialogOpen(false)
   }
 
-  useEffect(() => {
-    if (fetchedData !== null) {
-      const pageCount = parseInt(fetchedData.length / 15)
-      if (fetchedData.length % 15 === 0) {
-        setTotalPages(pageCount)
-      } else {
-        setTotalPages(pageCount + 1)
-      }
-    }
-  }, [fetchedData])
+  // useEffect(() => {
+  //   if (fetchedData !== null) {
+  //     const pageCount = parseInt(fetchedData.length / 15)
+  //     if (fetchedData.length % 15 === 0) {
+  //       setTotalPages(pageCount)
+  //     } else {
+  //       setTotalPages(pageCount + 1)
+  //     }
+  //   }
+  // }, [fetchedData])
 
-  useEffect(() => {
-    if (fetchedData !== null) {
-      const currData = fetchedData.slice(start, start + 15)
-      setTableData(currData)
-    }
-  }, [page, fetchedData])
+  // useEffect(() => {
+  //   if (fetchedData !== null) {
+  //     const currData = fetchedData.slice(start, start + 15)
+  //     setLoading(false)
+  //     setTableData(currData)
+  //   }
+  // }, [page, fetchedData])
 
   useEffect(async () => {
     try {
-      const { data } = await axios.get(
-        `${API_SERVICE}/api/v1/main/random/${count}`
-      )
+      const { data } = await axios.get(`${API_SERVICE}/api/v1/main/random`)
       setFetchedData(data)
+      setLoading(false)
     } catch (error) {
       console.log(error.message)
     }
   }, [])
 
-  const moveForward = () => {
-    setStart(start + 15)
-    setPage(page + 1)
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage)
   }
 
-  const moveBack = () => {
-    setStart(start - 15)
-    setPage(page - 1)
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10))
+    setPage(0)
   }
+
+  // const moveForward = () => {
+  //   setStart(start + 15)
+  //   setPage(page + 1)
+  // }
+
+  // const moveBack = () => {
+  //   setStart(start - 15)
+  //   setPage(page - 1)
+  // }
 
   const addtoSaveList = async (rowData) => {
     try {
@@ -161,13 +175,15 @@ const Search = () => {
       setSnackOpen(true)
       return
     }
+
+    setLoading(true)
+    setFetchedData([])
     try {
       const { data } = await axios.get(
-        `${API_SERVICE}/api/v1/main/filter/${count}?firstName=${firstNameFilter}
-        &lastName=${lastNameFilter}&country=${locationFilter}&jobRole=${jobFilter}
-        &company=${companyFilter}&industry=${industryFilter}`
+        `${API_SERVICE}/api/v1/main/filter/${count}?firstName=${firstNameFilter}&lastName=${lastNameFilter}&country=${locationFilter}&jobRole=${jobFilter}&company=${companyFilter}&industry=${industryFilter}`
       )
 
+      setLoading(false)
       setFetchedData(data)
     } catch (error) {
       setMessage(error)
@@ -182,17 +198,23 @@ const Search = () => {
         setDialogOpen(true)
         return
       }
+      setLoading(true)
+      setFetchedData([])
 
       const { data } = await axios.get(
-        `${API_SERVICE}/api/v1/main/filter/${count}?firstName=${text}`
+        `${API_SERVICE}/api/v1/main/search/${count}?firstName=${text}&lastName=${text}&email=${text}`
       )
+      setLoading(false)
       setFetchedData(data)
+      console.log(data)
     } catch (error) {
-      setMessage(error)
+      setMessage(error.message)
       setVariant('error')
       setSnackOpen(true)
     }
   }
+
+  console.log(fetchedData.length)
 
   return (
     <>
@@ -292,100 +314,80 @@ const Search = () => {
                     </TableHead>
 
                     <TableBody>
-                      {tableData.length !== 0
-                        ? tableData.map((row) => (
-                            <TableRow
-                              key={row.email}
-                              sx={{
-                                '&:last-child td, &:last-child th': {
-                                  border: 0,
-                                },
-                              }}
-                            >
-                              <TableCell padding='checkbox'>
-                                <Checkbox color='primary' />
-                              </TableCell>
-                              <TableCell component='th' scope='row'>
-                                {row.firstName}
-                              </TableCell>
-                              <TableCell align='center'>
-                                {row.lastName}
-                              </TableCell>
-                              <TableCell align='center'>
-                                {row.company}
-                              </TableCell>
-                              <TableCell align='center'>
-                                {row.jobRole}
-                              </TableCell>
-                              <TableCell align='center'>
-                                {row.industry}
-                              </TableCell>
-                              <TableCell align='center'>{row.email}</TableCell>
-                              <TableCell align='center'>
-                                {row.phoneNumber}
-                              </TableCell>
-                              <TableCell align='center'>
-                                {row.linkedinProfile}
-                              </TableCell>
-                              <TableCell align='center'>
-                                {row.country}
-                              </TableCell>
-                              <TableCell align='center'>
-                                <Button onClick={() => addtoSaveList(row)}>
-                                  Save
-                                </Button>
-                              </TableCell>
-                            </TableRow>
-                          ))
-                        : filteredTableData.map((row) => (
-                            <TableRow
-                              key={row.email}
-                              sx={{
-                                '&:last-child td, &:last-child th': {
-                                  border: 0,
-                                },
-                              }}
-                            >
-                              <TableCell padding='checkbox'>
-                                <Checkbox color='primary' />
-                              </TableCell>
-                              <TableCell component='th' scope='row'>
-                                {row.firstName}
-                              </TableCell>
-                              <TableCell align='center'>
-                                {row.lastName}
-                              </TableCell>
-                              <TableCell align='center'>
-                                {row.company}
-                              </TableCell>
-                              <TableCell align='center'>
-                                {row.jobRole}
-                              </TableCell>
-                              <TableCell align='center'>
-                                {row.industry}
-                              </TableCell>
-                              <TableCell align='center'>{row.email}</TableCell>
-                              <TableCell align='center'>
-                                {row.phoneNumber}
-                              </TableCell>
-                              <TableCell align='center'>
-                                {row.linkedinProfile}
-                              </TableCell>
-                              <TableCell align='center'>
-                                {row.country}
-                              </TableCell>
-                              <TableCell align='center'>
-                                <Button onClick={() => addtoSaveList(row)}>
-                                  Save
-                                </Button>
-                              </TableCell>
-                            </TableRow>
-                          ))}
+                      {fetchedData.length !== 0 &&
+                        (rowsPerPage > 0
+                          ? fetchedData.slice(
+                              page * rowsPerPage,
+                              page * rowsPerPage + rowsPerPage
+                            )
+                          : fetchedData
+                        ).map((row) => (
+                          <TableRow
+                            key={row.email}
+                            sx={{
+                              '&:last-child td, &:last-child th': {
+                                border: 0,
+                              },
+                            }}
+                          >
+                            <TableCell padding='checkbox'>
+                              <Checkbox color='primary' />
+                            </TableCell>
+                            <TableCell component='th' scope='row'>
+                              {row.firstName}
+                            </TableCell>
+                            <TableCell align='center'>{row.lastName}</TableCell>
+                            <TableCell align='center'>{row.company}</TableCell>
+                            <TableCell align='center'>{row.jobRole}</TableCell>
+                            <TableCell align='center'>{row.industry}</TableCell>
+                            <TableCell align='center'>{row.email}</TableCell>
+                            <TableCell align='center'>
+                              {row.phoneNumber}
+                            </TableCell>
+                            <TableCell align='center'>
+                              {row.linkedinProfile}
+                            </TableCell>
+                            <TableCell align='center'>{row.country}</TableCell>
+                            <TableCell align='center'>
+                              <Button onClick={() => addtoSaveList(row)}>
+                                Save
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
                     </TableBody>
                   </Table>
+
+                  {loading && (
+                    <center>
+                      <CircularProgress sx={{ mt: 3 }} />
+                    </center>
+                  )}
+                  {loading && (
+                    <center>
+                      <Typography
+                        sx={{ my: 3 }}
+                        color='textPrimary'
+                        variant='h4'
+                      >
+                        Loading
+                      </Typography>
+                    </center>
+                  )}
                 </TableContainer>
+                {fetchedData !== null && (
+                  <TablePagination
+                    rowsPerPageOptions={[5, 10, 25]}
+                    component='div'
+                    count={fetchedData.length}
+                    rowsPerPage={rowsPerPage}
+                    page={page}
+                    onPageChange={handleChangePage}
+                    onRowsPerPageChange={handleChangeRowsPerPage}
+                  />
+                )}
               </CardContent>
-              <Stack direction='row' justifyContent='center' sx={{ mt: 4 }}>
+              {/* <Stack direction='row' justifyContent='center' sx={{ mt: 4 }}>
                 {start === 0 ? (
                   <IconButton
                     disabled
@@ -408,7 +410,7 @@ const Search = () => {
                     <ArrowForwardIos />
                   </IconButton>
                 )}
-              </Stack>
+              </Stack> */}
             </Card>
             <SnackMessage
               variant={variant}
