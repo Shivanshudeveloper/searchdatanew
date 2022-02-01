@@ -194,15 +194,11 @@ const Search = () => {
 
   const search = async () => {
     try {
-      if (text.length <= 3) {
-        setDialogOpen(true)
-        return
-      }
       setLoading(true)
       setFetchedData([])
 
       const { data } = await axios.get(
-        `${API_SERVICE}/api/v1/main/search/${count}?firstName=${text}&lastName=${text}&email=${text}`
+        `${API_SERVICE}/api/v1/main/search/${count}?search=${text}`
       )
       setLoading(false)
       setFetchedData(data)
@@ -345,7 +341,12 @@ const Search = () => {
                               {row.phoneNumber}
                             </TableCell>
                             <TableCell align='center'>
-                              {row.linkedinProfile}
+                              <a
+                                href={`https://www.${row.linkedinProfile}`}
+                                target='_blank'
+                              >
+                                {row.linkedinProfile}
+                              </a>
                             </TableCell>
                             <TableCell align='center'>{row.country}</TableCell>
                             <TableCell align='center'>
